@@ -34,10 +34,11 @@ python src/validate_data.py   # quality report + data/processed/credit_default_v
 Then build the database (SQL Server Express, instance `SQLEXPRESS`):
 
 ```powershell
-sqlcmd -S "np:\.\pipe\MSSQL$SQLEXPRESS\sql\query" -E -C -i sql_create_tables.sql
+$server = 'np:\.\pipe\MSSQL$SQLEXPRESS\sql\query'   # local named pipe for SQL Express
+sqlcmd -S $server -E -C -i sql\01_create_tables.sql
 python src/load_to_sql.py
-sqlcmd -S "np:\.\pipe\MSSQL$SQLEXPRESS\sql\query" -E -C -i sql_load_data.sql      # ends with reconciliation checks
-sqlcmd -S "np:\.\pipe\MSSQL$SQLEXPRESS\sql\query" -E -C -i sql_analytics_views.sql
+sqlcmd -S $server -E -C -i sql\02_load_data.sql        # ends with reconciliation checks
+sqlcmd -S $server -E -C -i sql\03_analytics_views.sql
 ```
 
 ## Structure
