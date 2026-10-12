@@ -7,7 +7,7 @@ End-to-end credit risk analytics project for a fictional retail bank: which cust
 ## Status
 
 - [x] Milestone 1: environment, data download, data-quality checks
-- [ ] Milestone 2: SQL Server schema and analytics views
+- [x] Milestone 2: SQL Server schema and analytics views
 - [ ] Milestone 3: Power BI report
 - [ ] Milestone 4: default prediction model
 - [ ] Milestone 5: management summary
@@ -29,6 +29,15 @@ pip install -r requirements.txt
 
 python src/load_data.py       # downloads to data/raw/
 python src/validate_data.py   # quality report + data/processed/credit_default_validated.csv
+```
+
+Then build the database (SQL Server Express, instance `SQLEXPRESS`):
+
+```powershell
+sqlcmd -S "np:\.\pipe\MSSQL$SQLEXPRESS\sql\query" -E -C -i sql_create_tables.sql
+python src/load_to_sql.py
+sqlcmd -S "np:\.\pipe\MSSQL$SQLEXPRESS\sql\query" -E -C -i sql_load_data.sql      # ends with reconciliation checks
+sqlcmd -S "np:\.\pipe\MSSQL$SQLEXPRESS\sql\query" -E -C -i sql_analytics_views.sql
 ```
 
 ## Structure
