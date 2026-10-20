@@ -1,0 +1,2 @@
+# Notebooks are mostly embedded chart images; keep the language bar about the SQL and Python code
+*.ipynb linguist-documentation
