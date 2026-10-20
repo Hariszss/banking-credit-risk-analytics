@@ -1,0 +1,214 @@
+{
+  "run_at": "2026-10-20T14:52:59",
+  "rows": {
+    "train": 22500,
+    "test": 7500
+  },
+  "default_rate": {
+    "train": 0.2212,
+    "test": 0.2212
+  },
+  "cross_validation_auc": {
+    "rule_based_segment": {
+      "auc_mean": 0.7342,
+      "auc_std": null
+    },
+    "logistic_regression": {
+      "auc_mean": 0.7737,
+      "auc_std": 0.0085
+    },
+    "gradient_boosting": {
+      "auc_mean": 0.7872,
+      "auc_std": 0.0089
+    }
+  },
+  "decision": {
+    "boosting_minus_logistic_auc": 0.0135,
+    "chosen_model": "gradient_boosting",
+    "sensitive_attributes_auc_gain": -0.0001,
+    "sensitive_attributes_used": false,
+    "features": [
+      "log_credit_limit",
+      "delay_m1",
+      "delay_m2",
+      "delay_m3",
+      "delay_m4",
+      "delay_m5",
+      "delay_m6",
+      "months_delinquent_6m",
+      "max_months_delayed_6m",
+      "latest_utilisation",
+      "avg_utilisation_6m",
+      "months_over_limit_6m",
+      "utilisation_trend",
+      "avg_payment_ratio_capped",
+      "payment_ratio_missing",
+      "paid_to_billed_6m",
+      "latest_payment_to_limit",
+      "inactive_6m",
+      "age",
+      "latest_status_group",
+      "education_group"
+    ]
+  },
+  "test_set": {
+    "gradient_boosting": {
+      "auc": 0.7803,
+      "gini": 0.5605,
+      "ks": 0.4242,
+      "average_precision": 0.5611,
+      "capture_top_10pct": 0.3159,
+      "capture_top_20pct": 0.5081,
+      "brier": 0.1345
+    },
+    "logistic_regression": {
+      "auc": 0.7578,
+      "gini": 0.5157,
+      "ks": 0.4004,
+      "average_precision": 0.5263,
+      "capture_top_10pct": 0.3038,
+      "capture_top_20pct": 0.4991
+    },
+    "rule_based_segment": {
+      "auc": 0.7246,
+      "gini": 0.4492,
+      "ks": 0.36,
+      "average_precision": 0.4255,
+      "capture_top_10pct": 0.2676,
+      "capture_top_20pct": 0.475
+    }
+  },
+  "same_flag_volume_as_rule_high": {
+    "flagged_share": 0.1627,
+    "rule_precision": 0.6025,
+    "rule_recall": 0.443,
+    "model_precision": 0.6033,
+    "model_recall": 0.4436
+  },
+  "fairness_by_sex_test_set": [
+    {
+      "sex_label": "Female",
+      "customers": 4517,
+      "actual_rate": 0.2119,
+      "predicted_rate": 0.2199,
+      "flagged_rate": 0.1226
+    },
+    {
+      "sex_label": "Male",
+      "customers": 2983,
+      "actual_rate": 0.2353,
+      "predicted_rate": 0.2293,
+      "flagged_rate": 0.1271
+    }
+  ],
+  "permutation_importance_top10": [
+    {
+      "feature": "months_delinquent_6m",
+      "auc_drop": 0.0342
+    },
+    {
+      "feature": "log_credit_limit",
+      "auc_drop": 0.0229
+    },
+    {
+      "feature": "delay_m1",
+      "auc_drop": 0.0222
+    },
+    {
+      "feature": "avg_utilisation_6m",
+      "auc_drop": 0.0168
+    },
+    {
+      "feature": "latest_utilisation",
+      "auc_drop": 0.0097
+    },
+    {
+      "feature": "avg_payment_ratio_capped",
+      "auc_drop": 0.0033
+    },
+    {
+      "feature": "max_months_delayed_6m",
+      "auc_drop": 0.0028
+    },
+    {
+      "feature": "latest_payment_to_limit",
+      "auc_drop": 0.0026
+    },
+    {
+      "feature": "latest_status_group",
+      "auc_drop": 0.0023
+    },
+    {
+      "feature": "education_group",
+      "auc_drop": 0.0022
+    }
+  ],
+  "logistic_coefficients_top10": [
+    {
+      "feature": "cat__education_group_Other/Unknown",
+      "coefficient": -1.0872
+    },
+    {
+      "feature": "num__months_delinquent_6m",
+      "coefficient": 0.874
+    },
+    {
+      "feature": "cat__latest_status_group_Paid in full",
+      "coefficient": 0.8453
+    },
+    {
+      "feature": "cat__latest_status_group_No consumption",
+      "coefficient": 0.6253
+    },
+    {
+      "feature": "num__delay_m1",
+      "coefficient": 0.4416
+    },
+    {
+      "feature": "num__delay_m2",
+      "coefficient": -0.3364
+    },
+    {
+      "feature": "num__max_months_delayed_6m",
+      "coefficient": 0.2982
+    },
+    {
+      "feature": "num__log_credit_limit",
+      "coefficient": -0.2566
+    },
+    {
+      "feature": "num__avg_payment_ratio_capped",
+      "coefficient": -0.2362
+    },
+    {
+      "feature": "num__latest_utilisation",
+      "coefficient": 0.1689
+    }
+  ],
+  "risk_bands_out_of_fold": [
+    {
+      "risk_band": "1. Low (<10%)",
+      "customers": 8879,
+      "predicted_pd": 0.068,
+      "actual_rate": 0.0658
+    },
+    {
+      "risk_band": "2. Medium (10-25%)",
+      "customers": 13311,
+      "predicted_pd": 0.1597,
+      "actual_rate": 0.1587
+    },
+    {
+      "risk_band": "3. High (25-50%)",
+      "customers": 4245,
+      "predicted_pd": 0.351,
+      "actual_rate": 0.3564
+    },
+    {
+      "risk_band": "4. Very high (50%+)",
+      "customers": 3565,
+      "predicted_pd": 0.6747,
+      "actual_rate": 0.6805
+    }
+  ]
+}
