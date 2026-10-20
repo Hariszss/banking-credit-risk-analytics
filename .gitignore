@@ -14,3 +14,6 @@ data/processed/*
 ~$*
 **/.pbi/localSettings.json
 **/.pbi/cache.abf
+
+# Personal interview notes (kept local)
+docs/interview_guide.md
