@@ -1,0 +1,116 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "bh_matrix_roll",
+  "position": {
+    "x": 650,
+    "y": 370,
+    "z": 3,
+    "width": 610,
+    "height": 335,
+    "tabOrder": 3
+  },
+  "visual": {
+    "visualType": "pivotTable",
+    "query": {
+      "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Roll Rates"
+                    }
+                  },
+                  "Property": "From bucket"
+                }
+              },
+              "queryRef": "Roll Rates.From bucket",
+              "nativeQueryRef": "From bucket"
+            }
+          ]
+        },
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Roll Rates"
+                    }
+                  },
+                  "Property": "To bucket"
+                }
+              },
+              "queryRef": "Roll Rates.To bucket",
+              "nativeQueryRef": "To bucket"
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Roll Rates"
+                    }
+                  },
+                  "Property": "Roll rate"
+                }
+              },
+              "queryRef": "Roll Rates.Roll rate",
+              "nativeQueryRef": "Roll rate"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Roll rates: status next month (Apr-Aug 2005)'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Once behind, only ~30% catch up the following month'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

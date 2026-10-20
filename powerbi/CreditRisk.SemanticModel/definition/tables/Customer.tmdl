@@ -1,0 +1,272 @@
+table Customer
+	lineageTag: d2b36d06-8f5e-59ee-bc7a-f015575c9ff0
+
+	/// Number of customers in the current filter context.
+	measure Customers = COUNTROWS(Customer)
+		formatString: #,0
+		lineageTag: 1793c6a2-19a6-595d-8f7b-feccf5892faa
+
+	/// Customers who defaulted in Oct 2005.
+	measure Defaults = SUM(Customer[Defaulted (Oct)])
+		formatString: #,0
+		lineageTag: 27915cba-5a48-5bf8-abe4-36735cb87df9
+
+	/// Share of customers who defaulted in Oct 2005.
+	measure 'Default rate' = DIVIDE([Defaults], [Customers])
+		formatString: 0.0%
+		lineageTag: 6c6c8946-2976-5ec4-9082-aeb2fe6e38d9
+
+	/// Default rate of the whole portfolio, ignoring filters.
+	measure 'Portfolio default rate' = CALCULATE([Default rate], REMOVEFILTERS(Customer))
+		formatString: 0.0%
+		lineageTag: 526334a3-e603-5784-810c-aefacbbb3965
+
+	/// Default rate relative to the portfolio. Above 1 = riskier than average.
+	measure 'Default rate lift' = DIVIDE([Default rate], [Portfolio default rate])
+		formatString: 0.00x
+		lineageTag: bdf5f12e-c88e-554d-a469-19e0c4553673
+
+	/// Sum of credit limits (not exposure at default).
+	measure 'Total credit limit' = SUM(Customer[Credit limit])
+		formatString: #,0
+		lineageTag: 5f7dd5e4-9012-57bd-9a6a-aa5e1d87d260
+
+	/// Positive statement balances in Sep 2005.
+	measure 'Balance (Sep) total' = SUMX(Customer, MAX(Customer[Balance (Sep)], 0))
+		formatString: #,0
+		lineageTag: 536c3bda-2f81-5b22-b1c6-5e5670605d13
+
+	/// Average Sep balance / credit limit.
+	measure 'Avg utilisation (Sep)' = AVERAGE(Customer[Utilisation (Sep)])
+		formatString: 0.0%
+		lineageTag: 6eae7bfc-0a6f-5932-93b0-4fb2abd5ce82
+
+	/// Share of customers with a predicted PD of 25% or more.
+	measure 'Share high risk' = DIVIDE(CALCULATE([Customers], Customer[Risk band] IN {"3. High (25-50%)", "4. Very high (50%+)"}), [Customers])
+		formatString: 0.0%
+		lineageTag: ca4636ee-5dfd-5fc1-ae6d-8504f46300bb
+
+	/// Average model probability of default.
+	measure 'Avg predicted PD' = AVERAGE(Customer[Predicted PD])
+		formatString: 0.0%
+		lineageTag: a40dee09-bdf2-5210-b45a-7319a9700cf9
+
+	/// Number of defaults the model expects (sum of PDs).
+	measure 'Expected defaults' = SUM(Customer[Predicted PD])
+		formatString: #,0
+		lineageTag: c8b03857-5cbc-57e6-8616-c500f88b8fb5
+
+	/// Capture rate: share of all defaulters that fall in this group.
+	measure 'Share of all defaulters' = DIVIDE([Defaults], CALCULATE([Defaults], ALLSELECTED(Customer)))
+		formatString: 0.0%
+		lineageTag: ba5657be-dbd8-581b-8a25-be75196f5967
+
+	/// Sep balance weighted by predicted PD. Indicative only: no LGD or EAD model.
+	measure 'PD-weighted balance (Sep)' = SUMX(Customer, Customer[Predicted PD] * MAX(Customer[Balance (Sep)], 0))
+		formatString: #,0
+		lineageTag: ba74e773-65ce-5760-8f7e-98fb836e4abb
+
+	column 'Customer ID'
+		dataType: int64
+		formatString: 0
+		lineageTag: fe7bbaf4-6865-54e6-b67e-c83b657b4d8a
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+		annotation SummarizationSetBy = User
+
+	column Age
+		dataType: int64
+		formatString: 0
+		lineageTag: f70ce2fe-1877-582f-a25d-a8a2769c5379
+		summarizeBy: none
+		sourceColumn: Age
+
+		annotation SummarizationSetBy = User
+
+	column 'Age band'
+		dataType: string
+		lineageTag: a9c58fbe-183f-5ad7-982d-1199bb7741f2
+		summarizeBy: none
+		sourceColumn: Age band
+
+		annotation SummarizationSetBy = User
+
+	column Sex
+		dataType: string
+		lineageTag: 3407043b-5bee-5f2d-ba17-9b402c58b2b7
+		summarizeBy: none
+		sourceColumn: Sex
+
+		annotation SummarizationSetBy = User
+
+	column Education
+		dataType: string
+		lineageTag: 8e5db6e5-c1e1-5548-bbd2-359e8c0ce68a
+		summarizeBy: none
+		sourceColumn: Education
+
+		annotation SummarizationSetBy = User
+
+	column 'Marital status'
+		dataType: string
+		lineageTag: a2a8526e-e20a-5b52-9b6f-b53fc2f6fdcd
+		summarizeBy: none
+		sourceColumn: Marital status
+
+		annotation SummarizationSetBy = User
+
+	column 'Credit limit'
+		dataType: int64
+		formatString: #,0
+		lineageTag: 796534ac-a7ec-56f7-b332-aaa0a0dcb922
+		summarizeBy: none
+		sourceColumn: Credit limit
+
+		annotation SummarizationSetBy = User
+
+	column 'Credit limit band'
+		dataType: string
+		lineageTag: 593a23c9-661d-566c-a31d-a7d91bed7d4e
+		summarizeBy: none
+		sourceColumn: Credit limit band
+
+		annotation SummarizationSetBy = User
+
+	column 'Repayment status code (Sep)'
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 931908af-2a71-58a6-b2c6-660833f0c1e6
+		summarizeBy: none
+		sourceColumn: Repayment status code (Sep)
+
+		annotation SummarizationSetBy = User
+
+	column 'Repayment status (Sep)'
+		dataType: string
+		lineageTag: 2da77b9b-aafc-5493-8a32-cf6187760d01
+		summarizeBy: none
+		sourceColumn: Repayment status (Sep)
+		sortByColumn: 'Repayment status code (Sep)'
+
+		annotation SummarizationSetBy = User
+
+	column 'Months late (Sep)'
+		dataType: int64
+		formatString: 0
+		lineageTag: 9c0395f1-9497-5766-a36b-98feaf961b49
+		summarizeBy: none
+		sourceColumn: Months late (Sep)
+
+		annotation SummarizationSetBy = User
+
+	column 'Balance (Sep)'
+		dataType: int64
+		formatString: #,0
+		lineageTag: 6e909d54-cd1b-546a-aa2a-c376ba0b974e
+		summarizeBy: none
+		sourceColumn: Balance (Sep)
+
+		annotation SummarizationSetBy = User
+
+	column 'Utilisation (Sep)'
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 0f1c692a-9a7c-5b80-8448-bad258c2868c
+		summarizeBy: none
+		sourceColumn: Utilisation (Sep)
+
+		annotation SummarizationSetBy = User
+
+	column 'Utilisation band (Sep)'
+		dataType: string
+		lineageTag: 0f9a0a3f-0f3e-55a0-9d0b-fae991ffb4a4
+		summarizeBy: none
+		sourceColumn: Utilisation band (Sep)
+
+		annotation SummarizationSetBy = User
+
+	column 'Avg utilisation (6m)'
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 6caa6c37-66ba-5bcc-8288-aded76465c86
+		summarizeBy: none
+		sourceColumn: Avg utilisation (6m)
+
+		annotation SummarizationSetBy = User
+
+	column 'Months late (last 6)'
+		dataType: int64
+		formatString: 0
+		lineageTag: ce8bb6cb-0333-5640-8895-f6e1827444c5
+		summarizeBy: none
+		sourceColumn: Months late (last 6)
+
+		annotation SummarizationSetBy = User
+
+	column 'Rule-based segment'
+		dataType: string
+		lineageTag: 27ad44e6-efc1-5d2d-984f-21970afb20c4
+		summarizeBy: none
+		sourceColumn: Rule-based segment
+
+		annotation SummarizationSetBy = User
+
+	column 'Defaulted (Oct)'
+		dataType: int64
+		formatString: 0
+		lineageTag: 643d3dee-7b0e-5624-a0d5-bad85fc4c534
+		summarizeBy: none
+		sourceColumn: Defaulted (Oct)
+
+		annotation SummarizationSetBy = User
+
+	column 'Predicted PD'
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 1b9d1a45-cfeb-5cb8-8e38-434faad2727e
+		summarizeBy: none
+		sourceColumn: Predicted PD
+
+		annotation SummarizationSetBy = User
+
+	column 'Risk decile'
+		dataType: int64
+		formatString: 0
+		lineageTag: 4bdfea83-22bd-5888-96a7-0ad840ffcbbb
+		summarizeBy: none
+		sourceColumn: Risk decile
+
+		annotation SummarizationSetBy = User
+
+	column 'Risk band'
+		dataType: string
+		lineageTag: 33e7e6fb-4ff2-58dc-9ded-625d1619854f
+		summarizeBy: none
+		sourceColumn: Risk band
+
+		annotation SummarizationSetBy = User
+
+	column Outcome
+		dataType: string
+		lineageTag: c56e516a-00a0-5edf-95ac-3764e8a1d409
+		summarizeBy: none
+		sourceColumn: Outcome
+
+		annotation SummarizationSetBy = User
+
+	partition Customer = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(SqlServer, SqlDatabase),
+				    View = Source{[Schema = "analytics", Item = "vw_customer_risk"]}[Data],
+				    Selected = Table.SelectColumns(View, {"customer_id", "age", "age_band", "sex_label", "education_group", "marriage_group", "credit_limit", "credit_limit_band", "latest_pay_status", "latest_pay_status_label", "latest_months_delayed", "latest_bill_amount", "latest_utilisation", "utilisation_band", "avg_utilisation_6m", "months_delinquent_6m", "early_warning_segment", "default_next_month", "pd_score", "risk_decile", "risk_band"}),
+				    Renamed = Table.RenameColumns(Selected, {{"customer_id", "Customer ID"}, {"age", "Age"}, {"age_band", "Age band"}, {"sex_label", "Sex"}, {"education_group", "Education"}, {"marriage_group", "Marital status"}, {"credit_limit", "Credit limit"}, {"credit_limit_band", "Credit limit band"}, {"latest_pay_status", "Repayment status code (Sep)"}, {"latest_pay_status_label", "Repayment status (Sep)"}, {"latest_months_delayed", "Months late (Sep)"}, {"latest_bill_amount", "Balance (Sep)"}, {"latest_utilisation", "Utilisation (Sep)"}, {"utilisation_band", "Utilisation band (Sep)"}, {"avg_utilisation_6m", "Avg utilisation (6m)"}, {"months_delinquent_6m", "Months late (last 6)"}, {"early_warning_segment", "Rule-based segment"}, {"default_next_month", "Defaulted (Oct)"}, {"pd_score", "Predicted PD"}, {"risk_decile", "Risk decile"}, {"risk_band", "Risk band"}}),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Customer ID", Int64.Type}, {"Age", Int64.Type}, {"Age band", type text}, {"Sex", type text}, {"Education", type text}, {"Marital status", type text}, {"Credit limit", Int64.Type}, {"Credit limit band", type text}, {"Repayment status code (Sep)", Int64.Type}, {"Repayment status (Sep)", type text}, {"Months late (Sep)", Int64.Type}, {"Balance (Sep)", Int64.Type}, {"Utilisation (Sep)", type number}, {"Utilisation band (Sep)", type text}, {"Avg utilisation (6m)", type number}, {"Months late (last 6)", Int64.Type}, {"Rule-based segment", type text}, {"Defaulted (Oct)", Int64.Type}, {"Predicted PD", type number}, {"Risk decile", Int64.Type}, {"Risk band", type text}}),
+				    WithOutcome = Table.AddColumn(Typed, "Outcome", each if [#"Defaulted (Oct)"] = 1 then "Defaulted in Oct" else "Did not default", type text)
+				in
+				    WithOutcome
+
+	annotation PBI_ResultType = Table

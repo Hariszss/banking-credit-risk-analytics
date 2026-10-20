@@ -1,0 +1,189 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "ew_table_watchlist",
+  "position": {
+    "x": 20,
+    "y": 440,
+    "z": 8,
+    "width": 1240,
+    "height": 265,
+    "tabOrder": 8
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Customer"
+                    }
+                  },
+                  "Property": "Customer ID"
+                }
+              },
+              "queryRef": "Customer.Customer ID",
+              "nativeQueryRef": "Customer ID"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Customer"
+                    }
+                  },
+                  "Property": "Predicted PD"
+                }
+              },
+              "queryRef": "Customer.Predicted PD",
+              "nativeQueryRef": "Predicted PD"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Customer"
+                    }
+                  },
+                  "Property": "Risk band"
+                }
+              },
+              "queryRef": "Customer.Risk band",
+              "nativeQueryRef": "Risk band"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Customer"
+                    }
+                  },
+                  "Property": "Repayment status (Sep)"
+                }
+              },
+              "queryRef": "Customer.Repayment status (Sep)",
+              "nativeQueryRef": "Repayment status (Sep)"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Customer"
+                    }
+                  },
+                  "Property": "Months late (last 6)"
+                }
+              },
+              "queryRef": "Customer.Months late (last 6)",
+              "nativeQueryRef": "Months late (last 6)"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Customer"
+                    }
+                  },
+                  "Property": "Utilisation (Sep)"
+                }
+              },
+              "queryRef": "Customer.Utilisation (Sep)",
+              "nativeQueryRef": "Utilisation (Sep)"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Customer"
+                    }
+                  },
+                  "Property": "Credit limit"
+                }
+              },
+              "queryRef": "Customer.Credit limit",
+              "nativeQueryRef": "Credit limit"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Customer"
+                    }
+                  },
+                  "Property": "Rule-based segment"
+                }
+              },
+              "queryRef": "Customer.Rule-based segment",
+              "nativeQueryRef": "Rule-based segment"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Customer"
+                  }
+                },
+                "Property": "Predicted PD"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": false
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Watch list: highest predicted probability of default first'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

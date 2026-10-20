@@ -1,0 +1,3 @@
+relationship 73426175-12a6-574a-b7fa-ee15116edf6f
+	fromColumn: 'Monthly Account'.'Customer ID'
+	toColumn: Customer.'Customer ID'

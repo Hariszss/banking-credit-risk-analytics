@@ -12,3 +12,5 @@ data/processed/*
 # Power BI temp files
 *.pbix.bak
 ~$*
+**/.pbi/localSettings.json
+**/.pbi/cache.abf

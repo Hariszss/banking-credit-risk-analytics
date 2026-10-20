@@ -1,0 +1,11 @@
+/// SQL Server instance that hosts CreditRiskDB
+expression SqlServer = "localhost\SQLEXPRESS" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 89987b2d-10db-5bd4-9100-1cf1deaf7e84
+
+	annotation PBI_ResultType = Text
+
+/// Database built by sql/01-04
+expression SqlDatabase = "CreditRiskDB" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 28557a64-c071-5afe-9c4e-766f3d063c4b
+
+	annotation PBI_ResultType = Text

@@ -1,0 +1,148 @@
+table 'Monthly Account'
+	lineageTag: c4b018d1-d8cc-596a-9da8-3b6498535d91
+
+	/// Share of customer-months 2+ months late. Comparable across months (status 1 is only coded in Sep).
+	measure '2+ months late rate' = DIVIDE(SUM('Monthly Account'[2+ months late]), COUNTROWS('Monthly Account'))
+		formatString: 0.0%
+		lineageTag: b9202d0e-22bc-5d34-828e-948dc49e2be9
+
+	/// Average balance / credit limit.
+	measure 'Avg utilisation' = AVERAGE('Monthly Account'[Utilisation])
+		formatString: 0.0%
+		lineageTag: 10267178-d6ee-5386-bac0-13a84cf25706
+
+	/// Share of customer-months with a balance above the limit.
+	measure 'Over-limit rate' = DIVIDE(SUM('Monthly Account'[Over limit]), COUNTROWS('Monthly Account'))
+		formatString: 0.0%
+		lineageTag: fbf983cf-c879-5dfc-9f40-b6441a6b19ad
+
+	/// Payments as a share of positive statement balances.
+	measure 'Paid to billed' = DIVIDE(SUM('Monthly Account'[Payment amount]), SUMX('Monthly Account', MAX('Monthly Account'[Bill amount], 0)))
+		formatString: 0.0%
+		lineageTag: 7ee06966-c8bf-50f0-a726-71835fc8350d
+
+	column 'Customer ID'
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 81e61fe5-a7e7-5244-9063-f1ccbaac185d
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+		annotation SummarizationSetBy = User
+
+	column 'Statement month'
+		dataType: dateTime
+		formatString: mmm yyyy
+		isHidden
+		lineageTag: c2f1366d-e283-5497-9cb0-afbfb3217ebb
+		summarizeBy: none
+		sourceColumn: Statement month
+
+		annotation SummarizationSetBy = User
+
+	column 'Month order'
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 291fa891-57be-5121-b3c8-0a63951c3020
+		summarizeBy: none
+		sourceColumn: Month order
+
+		annotation SummarizationSetBy = User
+
+	column Month
+		dataType: string
+		lineageTag: d41db79d-2c52-57d1-906b-6d4a8100427a
+		summarizeBy: none
+		sourceColumn: Month
+		sortByColumn: 'Month order'
+
+		annotation SummarizationSetBy = User
+
+	column 'Repayment status code'
+		dataType: int64
+		formatString: 0
+		isHidden
+		lineageTag: 110260f3-a133-5a25-bbbc-1c31f4afbfcd
+		summarizeBy: none
+		sourceColumn: Repayment status code
+
+		annotation SummarizationSetBy = User
+
+	column 'Repayment status'
+		dataType: string
+		lineageTag: 99403806-1206-5d73-bca7-3cb6f0f4de4e
+		summarizeBy: none
+		sourceColumn: Repayment status
+		sortByColumn: 'Repayment status code'
+
+		annotation SummarizationSetBy = User
+
+	column 'Months late'
+		dataType: int64
+		formatString: 0
+		lineageTag: af2ce23d-bdae-52c3-814d-7ffb5a342fea
+		summarizeBy: none
+		sourceColumn: Months late
+
+		annotation SummarizationSetBy = User
+
+	column '2+ months late'
+		dataType: int64
+		formatString: 0
+		lineageTag: 258f4c40-6550-5a45-8296-c837b89b59b6
+		summarizeBy: none
+		sourceColumn: 2+ months late
+
+		annotation SummarizationSetBy = User
+
+	column 'Over limit'
+		dataType: int64
+		formatString: 0
+		lineageTag: ffe93a14-4cda-5b6a-930d-e93be527f505
+		summarizeBy: none
+		sourceColumn: Over limit
+
+		annotation SummarizationSetBy = User
+
+	column 'Bill amount'
+		dataType: int64
+		formatString: #,0
+		lineageTag: 2d9e1267-901c-5aaa-97a2-185b15e39c40
+		summarizeBy: none
+		sourceColumn: Bill amount
+
+		annotation SummarizationSetBy = User
+
+	column 'Payment amount'
+		dataType: int64
+		formatString: #,0
+		lineageTag: 0ac042d9-5871-5d2d-b024-11c80597bcd5
+		summarizeBy: none
+		sourceColumn: Payment amount
+
+		annotation SummarizationSetBy = User
+
+	column Utilisation
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 6c0c89b2-8183-5c84-a1ba-a4a6f984c224
+		summarizeBy: none
+		sourceColumn: Utilisation
+
+		annotation SummarizationSetBy = User
+
+	partition 'Monthly Account' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(SqlServer, SqlDatabase),
+				    View = Source{[Schema = "analytics", Item = "vw_monthly_account"]}[Data],
+				    Selected = Table.SelectColumns(View, {"customer_id", "statement_month", "month_order", "month_label", "pay_status", "pay_status_label", "months_delayed", "is_delinquent_2plus", "is_over_limit", "bill_amount", "payment_amount", "utilisation"}),
+				    Renamed = Table.RenameColumns(Selected, {{"customer_id", "Customer ID"}, {"statement_month", "Statement month"}, {"month_order", "Month order"}, {"month_label", "Month"}, {"pay_status", "Repayment status code"}, {"pay_status_label", "Repayment status"}, {"months_delayed", "Months late"}, {"is_delinquent_2plus", "2+ months late"}, {"is_over_limit", "Over limit"}, {"bill_amount", "Bill amount"}, {"payment_amount", "Payment amount"}, {"utilisation", "Utilisation"}}),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"Customer ID", Int64.Type}, {"Statement month", type date}, {"Month order", Int64.Type}, {"Month", type text}, {"Repayment status code", Int64.Type}, {"Repayment status", type text}, {"Months late", Int64.Type}, {"2+ months late", Int64.Type}, {"Over limit", Int64.Type}, {"Bill amount", Int64.Type}, {"Payment amount", Int64.Type}, {"Utilisation", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

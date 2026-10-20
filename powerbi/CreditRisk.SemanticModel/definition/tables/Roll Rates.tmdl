@@ -1,0 +1,46 @@
+table 'Roll Rates'
+	lineageTag: e11591e0-5876-5799-9062-ded04e8e74b1
+
+	/// Share of customers in the From bucket that are in the To bucket one month later.
+	measure 'Roll rate' = DIVIDE(SUM('Roll Rates'[Transitions]), CALCULATE(SUM('Roll Rates'[Transitions]), REMOVEFILTERS('Roll Rates'[To bucket])))
+		formatString: 0.0%
+		lineageTag: 6dfdf2a5-a18c-513d-a595-5a1f00c23974
+
+	column 'From bucket'
+		dataType: string
+		lineageTag: fbe84911-5191-5084-839a-6318727e5817
+		summarizeBy: none
+		sourceColumn: From bucket
+
+		annotation SummarizationSetBy = User
+
+	column 'To bucket'
+		dataType: string
+		lineageTag: 9951c533-773d-5e79-a92f-80da0dffb2cd
+		summarizeBy: none
+		sourceColumn: To bucket
+
+		annotation SummarizationSetBy = User
+
+	column Transitions
+		dataType: int64
+		formatString: #,0
+		lineageTag: f7b2e08d-883a-5a57-8bf2-6115bb7fcd04
+		summarizeBy: none
+		sourceColumn: Transitions
+
+		annotation SummarizationSetBy = User
+
+	partition 'Roll Rates' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(SqlServer, SqlDatabase),
+				    View = Source{[Schema = "analytics", Item = "vw_roll_rates"]}[Data],
+				    Selected = Table.SelectColumns(View, {"from_bucket", "to_bucket", "transitions"}),
+				    Renamed = Table.RenameColumns(Selected, {{"from_bucket", "From bucket"}, {"to_bucket", "To bucket"}, {"transitions", "Transitions"}}),
+				    Typed = Table.TransformColumnTypes(Renamed, {{"From bucket", type text}, {"To bucket", type text}, {"Transitions", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
