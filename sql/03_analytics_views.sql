@@ -6,6 +6,7 @@
    vw_customer_profile        one row per customer, with bands and 6-month behaviour
    vw_segment_default_rates   default rate per segment, compared with the portfolio
    vw_monthly_portfolio_trend portfolio behaviour per month, defaulters vs non-defaulters
+   vw_roll_rates              month-to-month movement between delinquency buckets
    vw_portfolio_kpis          single-row headline numbers
 
    Definitions
@@ -13,6 +14,9 @@
    - payment ratio  = amount paid this month / previous month's statement,
                       only where that statement was positive. 1 = paid in full.
    - delinquent     = repayment status of 1 month late or worse.
+   - delinquent 2+  = 2 months late or worse. Use this for trends: status 1
+                      ("1 month late") is almost only coded in Sep 2005, so the
+                      1+ definition is not comparable across months.
    Safe to re-run (CREATE OR ALTER).
    ===================================================================== */
 
@@ -33,6 +37,7 @@ WITH base AS (
         ps.pay_status_label,
         ps.months_delayed,
         ps.is_delinquent,
+        CASE WHEN ps.months_delayed >= 2 THEN 1 ELSE 0 END AS is_delinquent_2plus,
         f.bill_amount,
         f.payment_amount,
         c.credit_limit,
@@ -148,7 +153,7 @@ SELECT
     COUNT(*)                                                     AS customers,
     SUM(s.default_next_month)                                    AS defaults,
     AVG(CAST(s.default_next_month AS DECIMAL(10, 6)))            AS default_rate,
-    CAST(COUNT(*) AS DECIMAL(10, 6)) / p.portfolio_customers     AS share_of_customers,
+    CAST(COUNT(*) AS DECIMAL(18, 6)) / p.portfolio_customers     AS share_of_customers,
     -- lift > 1: segment defaults more often than the portfolio average
     AVG(CAST(s.default_next_month AS DECIMAL(10, 6))) / p.portfolio_default_rate AS default_rate_lift
 FROM segments AS s
@@ -169,6 +174,7 @@ SELECT
     COUNT(*)                                                     AS customers,
     SUM(CAST(is_delinquent AS INT))                              AS delinquent_customers,
     AVG(CAST(is_delinquent AS DECIMAL(10, 6)))                   AS delinquency_rate,
+    AVG(CAST(is_delinquent_2plus AS DECIMAL(10, 6)))             AS delinquency_2plus_rate,
     AVG(utilisation)                                             AS avg_utilisation,
     AVG(CAST(is_over_limit AS DECIMAL(10, 6)))                   AS over_limit_rate,
     SUM(bill_amount)                                             AS total_billed,
@@ -178,7 +184,44 @@ GROUP BY statement_month, month_label, month_order, default_next_month;
 GO
 
 /* ---------------------------------------------------------------------
-   5. Headline KPIs (one row)
+   5. Roll rates: how customers move between delinquency buckets from one
+      month to the next. Uses Apr -> Aug only, because Sep is coded
+      differently (see "delinquent 2+" above).
+   --------------------------------------------------------------------- */
+CREATE OR ALTER VIEW analytics.vw_roll_rates AS
+WITH bucketed AS (
+    SELECT
+        customer_id,
+        month_order,
+        CASE WHEN months_delayed = 0 THEN '1. Up to date'
+             WHEN months_delayed <= 2 THEN '2. 1-2 months late'   -- status 1 is ~absent Apr-Aug (34 rows)
+             ELSE                          '3. 3+ months late' END AS bucket
+    FROM analytics.vw_monthly_account
+    WHERE month_order <= 5
+),
+-- LEAD in one pass instead of a self-join: the self-join recomputed the
+-- underlying window functions on both sides and took minutes
+transitions AS (
+    SELECT from_bucket, to_bucket
+    FROM (
+        SELECT bucket AS from_bucket,
+               LEAD(bucket) OVER (PARTITION BY customer_id ORDER BY month_order) AS to_bucket
+        FROM bucketed
+    ) AS x
+    WHERE to_bucket IS NOT NULL
+)
+SELECT
+    from_bucket,
+    to_bucket,
+    COUNT(*)                                                     AS transitions,
+    CAST(COUNT(*) AS DECIMAL(18, 6))
+        / SUM(COUNT(*)) OVER (PARTITION BY from_bucket)          AS roll_rate
+FROM transitions
+GROUP BY from_bucket, to_bucket;
+GO
+
+/* ---------------------------------------------------------------------
+   6. Headline KPIs (one row)
    --------------------------------------------------------------------- */
 CREATE OR ALTER VIEW analytics.vw_portfolio_kpis AS
 SELECT
